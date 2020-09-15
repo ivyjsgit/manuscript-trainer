@@ -12,6 +12,11 @@ import org.tensorflow.TensorFlow;
 
 public class model_trainer {
     public static void main(String[] args) throws IOException {
+        
+        final String value = "Hello from " + TensorFlow.version();
+        System.out.println(value);
+
+
 
         ArrayList<String> fileLists = new ArrayList<>();
         ArrayList<Symbol> symbolList = new ArrayList<>();
@@ -24,16 +29,12 @@ public class model_trainer {
 
         fileLists.removeIf(n->n.contains(".md")||n.contains(".DS_Store"));
 
-//        System.out.println(fileLists);
-//        for (String fileName: fileLists){
-//            symbolList.add(new Symbol(fileName));
-//        }
+        for (String fileName: fileLists){
+            symbolList.add(new Symbol(fileName));
+        }
 
-//        ArrayList<String> symbolTypes = (ArrayList<String>) symbolList.stream().map(n->n.getName()).collect(Collectors.toList());
+        ArrayList<String> symbolTypes = (ArrayList<String>) symbolList.stream().map(n->n.getName()).collect(Collectors.toList());
 
-//        System.out.println(symbolTypes);
-        final String value = "Hello from " + TensorFlow.version();
-        System.out.println(value);
 
     }
 }
