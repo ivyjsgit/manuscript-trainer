@@ -24,14 +24,16 @@ public class model_trainer {
 
         fileLists.removeIf(n->n.contains(".md")||n.contains(".DS_Store"));
 
-        System.out.println(fileLists);
-        for (String fileName: fileLists){
-            symbolList.add(new Symbol(fileName));
-        }
+//        System.out.println(fileLists);
+//        for (String fileName: fileLists){
+//            symbolList.add(new Symbol(fileName));
+//        }
 
-        ArrayList<String> symbolTypes = (ArrayList<String>) symbolList.stream().map(n->n.getName()).collect(Collectors.toList());
+//        ArrayList<String> symbolTypes = (ArrayList<String>) symbolList.stream().map(n->n.getName()).collect(Collectors.toList());
 
-        System.out.println(symbolTypes);
+//        System.out.println(symbolTypes);
+        final String value = "Hello from " + TensorFlow.version();
+        System.out.println(value);
 
     }
 }
