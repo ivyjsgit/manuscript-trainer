@@ -17,7 +17,7 @@ class Symbol:
 
 
 if __name__ == "__main__":
-    data_dir = "/Users/ivy/Desktop/Senior_Seminar/HOMUS-Bitmap"
+    data_dir = "/Users/ivy/Desktop/Senior_Seminar/HOMUS-Bitmap-Without-Git"
     image_count = len(list(glob.glob(f'{data_dir}/*/*.png')))
     print(image_count)
 
