@@ -25,8 +25,8 @@ if __name__ == "__main__":
     print(image_count)
 
     batch_size = 32
-    img_height = 180
-    img_width = 180
+    img_height = 100 #100 cleanly goes into our image resolution, so it just has to downscale by 3x
+    img_width = 100
 
     #Set up training data
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
@@ -52,8 +52,16 @@ if __name__ == "__main__":
     print(class_names)
 
 
+    #Display our images for testing
 
-
+    plt.figure(figsize=(10, 10))
+    for images, labels in train_ds.take(1):
+        for i in range(9):
+            ax = plt.subplot(3, 3, i + 1)
+            plt.imshow(images[i].numpy().astype("uint8"))
+            plt.title(class_names[labels[i]])
+            plt.axis("off")
+    plt.show()
 
     # Set up autotune
     # AUTOTUNE = tf.data.experimental.AUTOTUNE
@@ -65,24 +73,24 @@ if __name__ == "__main__":
 
     #Set up model
 
-    model = tf.keras.Sequential([
-    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(180, 180, 4)),
-    layers.MaxPooling2D((2, 2)),
-    layers.Conv2D(64, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
-    layers.Conv2D(64, (3, 3), activation='relu')
-])
+#     model = tf.keras.Sequential([
+#     layers.Conv2D(32, (3, 3), activation='relu', input_shape=(180, 180, 4)),
+#     layers.MaxPooling2D((2, 2)),
+#     layers.Conv2D(64, (3, 3), activation='relu'),
+#     layers.MaxPooling2D((2, 2)),
+#     layers.Conv2D(64, (3, 3), activation='relu')
+# ])
 
-model.add(layers.Flatten())
-model.add(layers.Dense(64, activation='relu'))
-model.add(layers.Dense(10))
+# model.add(layers.Flatten())
+# model.add(layers.Dense(64, activation='relu'))
+# model.add(layers.Dense(10))
 
-model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              metrics=['accuracy'])
+# model.compile(optimizer='adam',
+#               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+#               metrics=['accuracy'])
 
 
-model.summary()
+# model.summary()
 
-history = model.fit(train_ds, epochs=10, 
-                    validation_data=(val_ds))
+# history = model.fit(train_ds, epochs=10, 
+#                     validation_data=(val_ds))
