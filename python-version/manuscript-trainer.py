@@ -1,7 +1,10 @@
-import io
+import numpy as np
 import os
+import PIL
+import PIL.Image
 import tensorflow as tf
-import random
+import pathlib
+import glob
 
 class Symbol:
     symbol_class = "unknown_symbol"
@@ -14,17 +17,33 @@ class Symbol:
 
 
 if __name__ == "__main__":
-    training_data_path = "/Users/ivy/Desktop/Senior_Seminar/HOMUS-Bitmap"
-    filepaths = [os.path.join(dp, f) for dp, dn, filenames in os.walk(training_data_path) for f in filenames if os.path.splitext(f)[1] == '.png']
-    symbols_list = list(map((lambda n: Symbol(n)), filepaths))
+    data_dir = "/Users/ivy/Desktop/Senior_Seminar/HOMUS-Bitmap"
+    image_count = len(list(glob.glob(f'{data_dir}/*/*.png')))
+    print(image_count)
 
-    #Shuffle the list
-    shuffled_symbol_list = random.sample(symbols_list,len(symbols_list))
+    batch_size = 32
+    img_height = 180
+    img_width = 180
 
-    #Get the classes and list of file paths
-    shuffled_paths=[]
-    shuffled_classes=[]
+    #Set up training data
+    train_ds = tf.keras.preprocessing.image_dataset_from_directory(
+    data_dir,
+    validation_split=0.2,
+    subset="training",
+    seed=123,
+    image_size=(img_height, img_width),
+    batch_size=batch_size)
 
-    for symbol in shuffled_symbol_list:
-        shuffled_paths.append(symbol.filepath)
-        shuffled_classes.append(symbol.symbol_class)
+    #Set up testing data
+    val_ds = tf.keras.preprocessing.image_dataset_from_directory(
+    data_dir,
+    validation_split=0.2,
+    subset="validation",
+    seed=123,
+    image_size=(img_height, img_width),
+    batch_size=batch_size)
+
+    class_names = train_ds.class_names
+    print(class_names)
+
+
