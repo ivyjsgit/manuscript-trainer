@@ -51,14 +51,38 @@ if __name__ == "__main__":
     class_names = train_ds.class_names
     print(class_names)
 
-    plt.figure(figsize=(10, 10))
-    for images, labels in train_ds.take(1):
-        for i in range(9):
-            ax = plt.subplot(3, 3, i + 1)
-            plt.imshow(images[i].numpy().astype("uint8"))
-            plt.title(class_names[labels[i]])
-            plt.axis("off")
 
-    plt.show()
 
-    #Normalization
+
+
+    # Set up autotune
+    # AUTOTUNE = tf.data.experimental.AUTOTUNE
+
+    # train_ds = train_ds.cache().prefetch(buffer_size=AUTOTUNE)
+    # val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
+
+    num_classes = len(train_ds.class_names)
+
+    #Set up model
+
+    model = tf.keras.Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(180, 180, 4)),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu')
+])
+
+model.add(layers.Flatten())
+model.add(layers.Dense(64, activation='relu'))
+model.add(layers.Dense(10))
+
+model.compile(optimizer='adam',
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              metrics=['accuracy'])
+
+
+model.summary()
+
+history = model.fit(train_ds, epochs=10, 
+                    validation_data=(val_ds))
