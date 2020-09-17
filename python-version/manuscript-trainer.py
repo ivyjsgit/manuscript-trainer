@@ -20,6 +20,7 @@ class Symbol:
 
 
 if __name__ == "__main__":
+    #This first section mostly follows the tutorial at https://www.tensorflow.org/tutorials/images/classification
     data_dir = "/Users/ivy/Desktop/Senior_Seminar/HOMUS-Bitmap-Without-Git"
     image_count = len(list(glob.glob(f'{data_dir}/*/*.png')))
     print(image_count)
@@ -33,64 +34,63 @@ if __name__ == "__main__":
     data_dir,
     validation_split=0.2,
     subset="training",
-    seed=123,
+    seed=823492389,
     image_size=(img_height, img_width),
-    batch_size=batch_size,
-    color_mode='rgba')
+    batch_size=batch_size)
 
     #Set up testing data
     val_ds = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
     subset="validation",
-    seed=123,
+    seed=823492389,
     image_size=(img_height, img_width),
-    batch_size=batch_size,
-    color_mode='rgba')
+    batch_size=batch_size)
 
     class_names = train_ds.class_names
     print(class_names)
 
+    num_classes = len(train_ds.class_names)
 
-    #Display our images for testing
+    #   Normalize data
+    normalization_layer = layers.experimental.preprocessing.Rescaling(1./255)
+    normalized_ds = train_ds.map(lambda x, y: (normalization_layer(x), y))
+    image_batch, labels_batch = next(iter(normalized_ds))
+
 
     plt.figure(figsize=(10, 10))
-    for images, labels in train_ds.take(1):
+    for images, labels in normalized_ds.take(1):
         for i in range(9):
             ax = plt.subplot(3, 3, i + 1)
             plt.imshow(images[i].numpy().astype("uint8"))
             plt.title(class_names[labels[i]])
             plt.axis("off")
-    plt.show()
 
-    # Set up autotune
-    # AUTOTUNE = tf.data.experimental.AUTOTUNE
-
-    # train_ds = train_ds.cache().prefetch(buffer_size=AUTOTUNE)
-    # val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
-
-    num_classes = len(train_ds.class_names)
 
     #Set up model
 
-#     model = tf.keras.Sequential([
-#     layers.Conv2D(32, (3, 3), activation='relu', input_shape=(180, 180, 4)),
-#     layers.MaxPooling2D((2, 2)),
-#     layers.Conv2D(64, (3, 3), activation='relu'),
-#     layers.MaxPooling2D((2, 2)),
-#     layers.Conv2D(64, (3, 3), activation='relu')
-# ])
-
-# model.add(layers.Flatten())
-# model.add(layers.Dense(64, activation='relu'))
-# model.add(layers.Dense(10))
-
-# model.compile(optimizer='adam',
-#               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-#               metrics=['accuracy'])
+    model = tf.keras.Sequential()
+    model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(100, 100, 3)))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 
 
-# model.summary()
+    model.add(layers.Flatten())
+    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(1))
 
-# history = model.fit(train_ds, epochs=10, 
-#                     validation_data=(val_ds))
+model.compile(optimizer='adam',
+              loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
+              metrics=['accuracy'])
+
+
+model.summary()
+
+history=model.fit(
+  train_ds,
+  validation_data=val_ds,
+  epochs=3
+)
