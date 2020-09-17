@@ -5,6 +5,9 @@ import PIL.Image
 import tensorflow as tf
 import pathlib
 import glob
+import matplotlib.pyplot as plt
+from tensorflow.keras import layers
+
 
 class Symbol:
     symbol_class = "unknown_symbol"
@@ -32,7 +35,8 @@ if __name__ == "__main__":
     subset="training",
     seed=123,
     image_size=(img_height, img_width),
-    batch_size=batch_size)
+    batch_size=batch_size,
+    color_mode='rgba')
 
     #Set up testing data
     val_ds = tf.keras.preprocessing.image_dataset_from_directory(
@@ -41,9 +45,20 @@ if __name__ == "__main__":
     subset="validation",
     seed=123,
     image_size=(img_height, img_width),
-    batch_size=batch_size)
+    batch_size=batch_size,
+    color_mode='rgba')
 
     class_names = train_ds.class_names
     print(class_names)
 
+    plt.figure(figsize=(10, 10))
+    for images, labels in train_ds.take(1):
+        for i in range(9):
+            ax = plt.subplot(3, 3, i + 1)
+            plt.imshow(images[i].numpy().astype("uint8"))
+            plt.title(class_names[labels[i]])
+            plt.axis("off")
 
+    plt.show()
+
+    #Normalization
