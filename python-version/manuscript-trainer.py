@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
 
     plt.figure(figsize=(10, 10))
-    for images, labels in normalized_ds.take(1):
+    for images, labels in train_ds.take(1):
         for i in range(9):
             ax = plt.subplot(3, 3, i + 1)
             plt.imshow(images[i].numpy().astype("uint8"))
@@ -72,10 +72,11 @@ if __name__ == "__main__":
 
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(64, (3,3), activation='relu', input_shape=(100, 100, 3)))
+    model.add(layers.experimental.preprocessing.Rescaling(1./255))
     model.add(layers.MaxPooling2D(pool_size=(2,2)))
-    model.add(layers.Conv2D(64, (5,5), activation='relu'))
+    model.add(layers.Conv2D(64, (5,5)))
     model.add(layers.MaxPooling2D(pool_size=(3,3)))
-    # model.add(layers.Dense(32, activation='relu'))
+    model.add(layers.Dense(64))
     model.add(layers.Flatten())
     # model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dropout(0.5))
@@ -93,7 +94,7 @@ if __name__ == "__main__":
                                         mode ="min", patience = 10,  
                                         restore_best_weights = True) 
     history=model.fit(
-    normalized_ds,
+    train_ds,
     validation_data=val_ds,
     epochs=100,
     callbacks=[earlystopping]
