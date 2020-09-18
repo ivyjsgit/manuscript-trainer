@@ -71,16 +71,14 @@ if __name__ == "__main__":
     #Set up model
 
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(64, (7,7), activation='relu', input_shape=(100, 100, 3)))
+    model.add(layers.Conv2D(64, (3,3), activation='relu', input_shape=(100, 100, 3)))
+    model.add(layers.MaxPooling2D(pool_size=(2,2)))
+    model.add(layers.Conv2D(64, (5,5), activation='relu'))
     model.add(layers.MaxPooling2D(pool_size=(3,3)))
-    model.add(layers.Conv2D(64, (7,7), activation='relu'))
-    model.add(layers.MaxPooling2D(pool_size=(3,3)))
-    model.add(layers.Conv2D(64, (7,7), activation='relu'))
-    # model.add(layers.Conv2D(64, (4, 4), activation='relu'))
-    # model.add(layers.MaxPooling2D((4, 4)))
-    # model.add(layers.Conv2D(64, (4, 4), activation='sigmoid'))
+    # model.add(layers.Dense(32, activation='relu'))
     model.add(layers.Flatten())
     model.add(layers.Dense(128, activation='relu'))
+    model.add(layers.Dropout(0.5))
     model.add(layers.Dense(32, activation='softmax'))
     
 
