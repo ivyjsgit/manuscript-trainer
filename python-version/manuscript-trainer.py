@@ -77,7 +77,7 @@ if __name__ == "__main__":
     model.add(layers.MaxPooling2D(pool_size=(3,3)))
     # model.add(layers.Dense(32, activation='relu'))
     model.add(layers.Flatten())
-    model.add(layers.Dense(128, activation='relu'))
+    # model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dropout(0.5))
     model.add(layers.Dense(32, activation='softmax'))
     
