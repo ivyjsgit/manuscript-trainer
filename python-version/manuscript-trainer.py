@@ -26,14 +26,14 @@ if __name__ == "__main__":
     image_count = len(list(glob.glob(f'{data_dir}/*/*.png')))
     print(image_count)
 
-    batch_size = 200
+    batch_size = 128
     img_height = 100 #100 cleanly goes into our image resolution, so it just has to downscale by 3x
     img_width = 100
 
     #Set up training data
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir,
-    validation_split=0.2,
+    validation_split=0.3,
     subset="training",
     seed=823492389,
     image_size=(img_height, img_width),
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     model.summary()
 
     earlystopping = callbacks.EarlyStopping(monitor ="val_loss",  
-                                        mode ="min", patience = 5,  
+                                        mode ="min", patience = 10,  
                                         restore_best_weights = True) 
     history=model.fit(
     normalized_ds,
