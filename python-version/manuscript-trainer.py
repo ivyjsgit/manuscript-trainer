@@ -7,6 +7,7 @@ import pathlib
 import glob
 import matplotlib.pyplot as plt
 from tensorflow.keras import layers
+from tensorflow.keras import callbacks 
 
 
 class Symbol:
@@ -25,7 +26,7 @@ if __name__ == "__main__":
     image_count = len(list(glob.glob(f'{data_dir}/*/*.png')))
     print(image_count)
 
-    batch_size = 32
+    batch_size = 200
     img_height = 100 #100 cleanly goes into our image resolution, so it just has to downscale by 3x
     img_width = 100
 
@@ -70,21 +71,32 @@ if __name__ == "__main__":
     #Set up model
 
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(64, (3, 3), activation='relu', input_shape=(100, 100, 3)))
-    model.add(layers.MaxPooling2D((2, 2)))
+    model.add(layers.Conv2D(64, (7,7), activation='relu', input_shape=(100, 100, 3)))
+    model.add(layers.MaxPooling2D(pool_size=(3,3)))
+    model.add(layers.Conv2D(64, (7,7), activation='relu'))
+    model.add(layers.MaxPooling2D(pool_size=(3,3)))
+    model.add(layers.Conv2D(64, (7,7), activation='relu'))
+    # model.add(layers.Conv2D(64, (4, 4), activation='relu'))
+    # model.add(layers.MaxPooling2D((4, 4)))
+    # model.add(layers.Conv2D(64, (4, 4), activation='sigmoid'))
     model.add(layers.Flatten())
-    model.add(layers.Conv2D(64, (3, 3), activation='relu', input_shape=(100, 100, 3)))
-    model.add(layers.Dense(32, activation='relu'))
+    model.add(layers.Dense(128, activation='relu'))
+    model.add(layers.Dense(32, activation='softmax'))
+    
 
     model.compile(optimizer='adam',
                 loss='sparse_categorical_crossentropy',
                 metrics=['accuracy'])
 
 
-model.summary()
+    model.summary()
 
-history=model.fit(
-  train_ds,
-  validation_data=val_ds,
-  epochs=10
-)
+    earlystopping = callbacks.EarlyStopping(monitor ="val_loss",  
+                                        mode ="min", patience = 5,  
+                                        restore_best_weights = True) 
+    history=model.fit(
+    normalized_ds,
+    validation_data=val_ds,
+    epochs=100,
+    callbacks=[earlystopping]
+    )
