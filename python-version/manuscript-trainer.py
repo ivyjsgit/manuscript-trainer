@@ -73,11 +73,11 @@ if __name__ == "__main__":
     model.add(layers.Conv2D(64, (3, 3), activation='relu', input_shape=(100, 100, 3)))
     model.add(layers.MaxPooling2D((2, 2)))
     model.add(layers.Flatten())
-    model.add(layers.Dense(64, activation='softmax'))
-    model.add(layers.Dense(32))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu', input_shape=(100, 100, 3)))
+    model.add(layers.Dense(32, activation='relu'))
 
     model.compile(optimizer='adam',
-                loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
+                loss='sparse_categorical_crossentropy',
                 metrics=['accuracy'])
 
 
