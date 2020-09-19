@@ -71,17 +71,19 @@ if __name__ == "__main__":
     #Set up model
 
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(64, (3,3), activation='relu', input_shape=(100, 100, 3)))
-    model.add(layers.experimental.preprocessing.Rescaling(1./255))
+    model.add(layers.experimental.preprocessing.Rescaling((1./255),input_shape=(100, 100, 3)))
+    model.add(layers.Conv2D(64, (3,3), activation='relu'))
     model.add(layers.MaxPooling2D(pool_size=(2,2)))
     model.add(layers.Conv2D(64, (5,5)))
     model.add(layers.MaxPooling2D(pool_size=(3,3)))
     model.add(layers.Dense(64))
     model.add(layers.Flatten())
-    # model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dropout(0.5))
     model.add(layers.Dense(32, activation='softmax'))
     
+
+
+
 
     model.compile(optimizer='adam',
                 loss='sparse_categorical_crossentropy',
@@ -93,9 +95,16 @@ if __name__ == "__main__":
     earlystopping = callbacks.EarlyStopping(monitor ="val_loss",  
                                         mode ="min", patience = 10,  
                                         restore_best_weights = True) 
+    checkpoint_path = "checkpoints/cp.ckpt"
+    checkpoint_dir = os.path.dirname(checkpoint_path)
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                 save_weights_only=True,
+                                                 verbose=1)
+
+
     history=model.fit(
     train_ds,
     validation_data=val_ds,
     epochs=100,
-    callbacks=[earlystopping]
+    callbacks=[earlystopping, cp_callback]
     )
