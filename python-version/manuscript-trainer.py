@@ -35,22 +35,27 @@ if __name__ == "__main__":
     img_width = 100
 
     #Set up training data
+    val_split = 0.2
+
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir,
-    validation_split=0.3,
+    validation_split=val_split,
     subset="training",
     seed=823492389,
     image_size=(img_height, img_width),
-    batch_size=batch_size)
+    batch_size=batch_size,
+    label_mode="categorical")
 
     #Set up testing data
     val_ds = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir,
-    validation_split=0.2,
+    validation_split=val_split,
     subset="validation",
     seed=823492389,
     image_size=(img_height, img_width),
-    batch_size=batch_size)
+    batch_size=batch_size, 
+    color_mode='rgb',
+    label_mode="categorical")
 
     class_names = train_ds.class_names
     print(class_names)
@@ -63,56 +68,46 @@ if __name__ == "__main__":
     image_batch, labels_batch = next(iter(normalized_ds))
 
 
-    plt.figure(figsize=(10, 10))
-    for images, labels in train_ds.take(1):
-        for i in range(9):
-            ax = plt.subplot(3, 3, i + 1)
-            plt.imshow(images[i].numpy().astype("uint8"))
-            plt.title(class_names[labels[i]])
-            plt.axis("off")
+    # plt.figure(figsize=(10, 10))
+    # for images, labels in train_ds.take(1):
+    #     for i in range(9):
+    #         ax = plt.subplot(3, 3, i + 1)
+    #         plt.imshow(images[i].numpy().astype("uint8"))
+    #         plt.title(class_names[labels[i]])
+    #         plt.axis("off")
 
 
     #Set up model
 
     model = tf.keras.Sequential()
-    model.add(layers.experimental.preprocessing.Rescaling((1./255),input_shape=(100, 100, 3)))
+    # model.add(layers.experimental.preprocessing.Rescaling((1./255),input_shape=(100, 100, 3)))
     model.add(layers.Conv2D(64, (3,3), activation='relu',input_shape=(100, 100, 3)))
     model.add(layers.MaxPooling2D(pool_size=(2,2)))
-    model.add(layers.Dropout(0.5))
+    model.add(layers.Dropout(0.2))
     model.add(layers.Conv2D(64, (5,5)))
     model.add(layers.MaxPooling2D(pool_size=(3,3)))
     model.add(layers.Dense(64))
     model.add(layers.Flatten())
     model.add(layers.Dense(32, activation='softmax'))
-    
-
-
-
 
     model.compile(optimizer='adam',
-                loss='sparse_categorical_crossentropy',
+                loss='categorical_crossentropy',
                 metrics=['accuracy'])
 
 
     model.summary()
 
     earlystopping = callbacks.EarlyStopping(monitor ="val_loss",  
-                                        mode ="min", patience = 10,  
+                                        mode ="min", patience = 7,  
                                         restore_best_weights = True) 
 
     logdir="logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
-
-    checkpoint_path = "checkpoints/cp.ckpt"
-    checkpoint_dir = os.path.dirname(checkpoint_path)
-    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
-                                                 save_weights_only=True,
-                                                 verbose=1)
 
 
     history=model.fit(
     train_ds,
     validation_data=val_ds,
     epochs=100,
-    callbacks=[earlystopping, cp_callback, tensorboard_callback]
+    callbacks=[earlystopping, tensorboard_callback]
     )
