@@ -13,6 +13,7 @@ buildNumber.properties
 .idea/
 
 python-version/__pycache__/
+python-version/logs/*
 
 */.DS_Store
 
