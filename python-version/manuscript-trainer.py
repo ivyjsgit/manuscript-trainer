@@ -80,7 +80,7 @@ if __name__ == "__main__":
     #Set up model
 
     model = tf.keras.Sequential()
-    # model.add(layers.experimental.preprocessing.Rescaling((1./255),input_shape=(100, 100, 3)))
+    model.add(layers.experimental.preprocessing.Rescaling((1./255),input_shape=(100, 100, 3)))
     model.add(layers.Conv2D(64, (3,3), activation='relu',input_shape=(100, 100, 3)))
     model.add(layers.MaxPooling2D(pool_size=(2,2)))
     model.add(layers.Dropout(0.2))
